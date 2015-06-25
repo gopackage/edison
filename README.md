@@ -20,3 +20,4 @@ then `go test ./...` normally.
 * unit tests
 
 [Go]: http://golang.org
+[gpm]: https://github.com/pote/gpm
