@@ -22,6 +22,7 @@ const (
 )
 
 func writeFile(path string, data []byte) (i int, err error) {
+	fmt.Println(">>", path, string(data))
 	file, err := os.OpenFile(path, os.O_WRONLY, 0644)
 	defer file.Close()
 	if err != nil {
