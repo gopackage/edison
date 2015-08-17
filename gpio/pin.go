@@ -1,4 +1,4 @@
-package edison
+package gpio
 
 import (
 	"errors"
