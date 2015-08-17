@@ -1,6 +1,8 @@
-// Package edison provides simplified Go development for Intel Edison.
-package edison
+// Package gpio provides simplified Go development for Intel Edison.
+package gpio
 
+// Init initializes the Edison gpio pins. This global initialization will
+// be removed and individual pins will initialize as they are created.
 func Init() error {
 	var err error
 	tristate := newDigitalPin(214)

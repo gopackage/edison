@@ -1,6 +1,9 @@
-package edison
+package gpio
 
-import "strconv"
+import (
+	"math"
+	"strconv"
+)
 
 // pwmPath returns pwm base path
 func pwmPath() string {
@@ -72,4 +75,9 @@ func (p *pwmPin) export() (err error) {
 func (p *pwmPin) unexport() (err error) {
 	_, err = writeFile(pwmUnExportPath(), []byte(p.pin))
 	return
+}
+
+// FromScale returns a converted input from min, max to 0.0...1.0.
+func FromScale(input, min, max float64) float64 {
+	return (input - math.Min(min, max)) / (math.Max(min, max) - math.Min(min, max))
 }

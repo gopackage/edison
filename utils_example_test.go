@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/metamech/edison"
+	. "../edison"
 )
 
 func ExampleAddrToID() {
@@ -12,7 +12,7 @@ func ExampleAddrToID() {
 	if err != nil {
 		// fail
 	}
-	id := edison.AddrToID(addr)
+	id := AddrToID(addr)
 	fmt.Printf("%x", id)
 	// Output: 123456789ab
 }

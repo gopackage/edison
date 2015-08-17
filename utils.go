@@ -3,7 +3,6 @@ package edison
 import (
 	"errors"
 	"fmt"
-	"math"
 	"net"
 )
 
@@ -45,9 +44,4 @@ func AddrToID(addr net.HardwareAddr) uint64 {
 	}
 
 	return id
-}
-
-// FromScale returns a converted input from min, max to 0.0...1.0.
-func FromScale(input, min, max float64) float64 {
-	return (input - math.Min(min, max)) / (math.Max(min, max) - math.Min(min, max))
 }
