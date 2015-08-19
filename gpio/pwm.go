@@ -46,7 +46,7 @@ func newPwmPin(pin int) *pwmPin {
 
 // enable writes value to pwm enable path
 func (p *pwmPin) enable(val string) (err error) {
-	_, err = writeFile(pwmEnablePath(p.pin), []byte(val))
+	_, err = writeFile(pwmEnablePath(p.pin), val)
 	return
 }
 
@@ -61,19 +61,19 @@ func (p *pwmPin) period() (period string, err error) {
 
 // writeDuty writes value to pwm duty cycle path
 func (p *pwmPin) writeDuty(duty string) (err error) {
-	_, err = writeFile(pwmDutyCyclePath(p.pin), []byte(duty))
+	_, err = writeFile(pwmDutyCyclePath(p.pin), duty)
 	return
 }
 
 // export writes pin to pwm export path
 func (p *pwmPin) export() (err error) {
-	_, err = writeFile(pwmExportPath(), []byte(p.pin))
+	_, err = writeFile(pwmExportPath(), p.pin)
 	return
 }
 
 // export writes pin to pwm unexport path
 func (p *pwmPin) unexport() (err error) {
-	_, err = writeFile(pwmUnExportPath(), []byte(p.pin))
+	_, err = writeFile(pwmUnExportPath(), p.pin)
 	return
 }
 

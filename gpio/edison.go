@@ -3,6 +3,8 @@ package gpio
 
 // Init initializes the Edison gpio pins. This global initialization will
 // be removed and individual pins will initialize as they are created.
+//
+// TODO[scoward] remove this global init and move to individual pin inits (see #5)
 func Init() error {
 	var err error
 	tristate := newDigitalPin(214)

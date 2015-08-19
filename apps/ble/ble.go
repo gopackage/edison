@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/badslug/cli"
+	"github.com/gopackage/cli"
 )
 
 func enable(program *cli.Program, command *cli.Command, unknownArgs []string) {
