@@ -21,33 +21,6 @@ const (
 	GPIOPATH = "/sys/class/gpio"
 )
 
-func writeFile(path string, data string) (i int, err error) {
-	fmt.Println(">>", path, data)
-	file, err := os.OpenFile(path, os.O_WRONLY, 0644)
-	defer file.Close()
-	if err != nil {
-		return
-	}
-
-	return file.Write([]byte(data))
-}
-
-func readFile(path string) ([]byte, error) {
-	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
-	defer file.Close()
-	if err != nil {
-		return make([]byte, 0), err
-	}
-
-	buf := make([]byte, 200)
-	var i = 0
-	i, err = file.Read(buf)
-	if i == 0 {
-		return buf, err
-	}
-	return buf[:i], err
-}
-
 type mux struct {
 	pin   int
 	value int
@@ -66,9 +39,6 @@ type fsPin struct {
 	pwmPin       int
 	label        string
 	mux          []mux
-}
-
-type Placeholder struct {
 }
 
 var pwmPins = make(map[int]*pwmPin)

@@ -25,8 +25,7 @@ func DeviceIntID() (uint64, error) {
 }
 
 // DeviceID returns the current device ID as a hex encoded string. Most
-// APIs will expect the hex encoded stringversion of the device ID so this
-// is a convenience method to give you that directly.
+// APIs will expect the hex encoded string version of the device ID.
 func DeviceID() (string, error) {
 	id, err := DeviceID()
 	if err != nil {
