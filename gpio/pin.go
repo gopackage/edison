@@ -17,6 +17,10 @@ const (
 	IN = "in"
 	// OUT output pin mode
 	OUT = "out"
+	// OUT Init high
+	OUT_INIT_HIGH = "high"
+	// OUT Init low
+	OUT_INIT_LOW = "low"
 	// GPIOPATH is the path to the sysfs gpio
 	GPIOPATH = "/sys/class/gpio"
 )
