@@ -20,7 +20,7 @@ type pwm_context struct {
 
 type PwmContext *pwm_context
 
-func pwm_setup_duty_fp(dev *pwm_context) error {
+func (dev *pwm_context) SetupDutyFile() error {
 	buf := fmt.Sprintf("/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev.chipid, dev.pin)
 	file, err := os.OpenFile(buf, os.O_RDWR, 0664)
 	if err != nil {
@@ -30,7 +30,7 @@ func pwm_setup_duty_fp(dev *pwm_context) error {
 	return nil
 }
 
-func pwm_write_period(dev *pwm_context, period int) error {
+func (dev *pwm_context) WritePeriod(period int) error {
 	if advance_func.pwm_period_replace != nil {
 		err := advance_func.pwm_period_replace(dev, period)
 		if err == nil {
@@ -56,16 +56,14 @@ func pwm_write_period(dev *pwm_context, period int) error {
 	return nil
 }
 
-func pwm_period_us(dev *pwm_context, us int) error {
+func (dev *pwm_context) Period(us int) error {
 	if us < plat.pwm_min_period || us > plat.pwm_max_period {
 		return fmt.Errorf("pwm: period vlaue outside platform range")
 	}
-	return pwm_write_period(dev, us*1000)
+	return dev.WritePeriod(us * 1000)
 }
 
-var PwmPeriod func(*pwm_context, int) error = pwm_period_us
-
-func pwm_enable(dev *pwm_context, enable int) error {
+func (dev *pwm_context) Enable(enable int) error {
 	var status int = 0
 	if enable != 0 {
 		status = 1
@@ -89,9 +87,7 @@ func pwm_enable(dev *pwm_context, enable int) error {
 	return nil
 }
 
-var PwmEnable func(*pwm_context, int) error = pwm_enable
-
-func pwm_read_period(dev *pwm_context) error {
+func (dev *pwm_context) ReadPeriod() error {
 	buf := fmt.Sprintf("/sys/class/pwm/pwmchip%d/pwm%d/period", dev.chipid, dev.pin)
 
 	output, err := ioutil.ReadFile(buf)
@@ -108,11 +104,9 @@ func pwm_read_period(dev *pwm_context) error {
 	return nil
 }
 
-var PwmReadPeriod func(*pwm_context) error = pwm_read_period
-
-func pwm_read_duty(dev *pwm_context) (int, error) {
+func (dev *pwm_context) ReadDuty() (int, error) {
 	if dev.duty_fp == nil {
-		if err := pwm_setup_duty_fp(dev); err != nil {
+		if err := dev.SetupDutyFile(); err != nil {
 			return -1, fmt.Errorf("pwm: Error setting up duty fp in pwm_read_duty for pin[%d]: %s", dev.pin, err)
 		}
 	} else {
@@ -136,13 +130,13 @@ func pwm_read_duty(dev *pwm_context) (int, error) {
 	return int(i), nil
 }
 
-func pwm_read(dev *pwm_context) (float32, error) {
-	if err := pwm_read_period(dev); err != nil {
+func (dev *pwm_context) Read() (float32, error) {
+	if err := dev.ReadPeriod(); err != nil {
 		return -1.0, fmt.Errorf("pwm: Error reading period in pwm_read for pin[%d]: %s", dev.pin, err)
 	}
 
 	if dev.period > 0 {
-		duty, err := pwm_read_duty(dev)
+		duty, err := dev.ReadDuty()
 		fmt.Printf("pwm_read: period: %d, duty: %d\n", dev.period, duty)
 		if err != nil {
 			return -1.0, fmt.Errorf("pwm: Error reading duty in pwm_read for pin[%d]: %s", dev.pin, err)
@@ -153,11 +147,9 @@ func pwm_read(dev *pwm_context) (float32, error) {
 	return 0.0, nil
 }
 
-var PwmRead func(*pwm_context) (float32, error) = pwm_read
-
-func pwm_write_duty(dev *pwm_context, duty int) error {
+func (dev *pwm_context) WriteDuty(duty int) error {
 	if dev.duty_fp == nil {
-		if err := pwm_setup_duty_fp(dev); err != nil {
+		if err := dev.SetupDutyFile(); err != nil {
 			return fmt.Errorf("pwm: Error writing duty: %s", err)
 		}
 	}
@@ -170,9 +162,9 @@ func pwm_write_duty(dev *pwm_context, duty int) error {
 	return nil
 }
 
-func pwm_write(dev *pwm_context, percentage float32) error {
+func (dev *pwm_context) Write(percentage float32) error {
 	if dev.period == -1 {
-		if err := PwmReadPeriod(dev); err != nil {
+		if err := dev.ReadPeriod(); err != nil {
 			return fmt.Errorf("pwm: pwm_write: %s", err)
 		}
 	}
@@ -188,10 +180,8 @@ func pwm_write(dev *pwm_context, percentage float32) error {
 		duty = int(percentage * float32(dev.period))
 	}
 	fmt.Printf("pwm: pin[%d] writing new duty[%d]\n", dev.pin, duty)
-	return pwm_write_duty(dev, duty)
+	return dev.WriteDuty(duty)
 }
-
-var PwmWrite func(*pwm_context, float32) error = pwm_write
 
 func PwmInitRaw(chipin, pin int) (*pwm_context, error) {
 	dev := &pwm_context{}
@@ -218,9 +208,11 @@ func PwmInitRaw(chipin, pin int) (*pwm_context, error) {
 			return nil, fmt.Errorf("pwm: Failed to write to export!  Potentially already enabled: %s", err)
 		}
 		dev.owner = true
-		pwm_period_us(dev, plat.pwm_default_period)
+		dev.Period(plat.pwm_default_period)
 	}
-	pwm_setup_duty_fp(dev)
+	if err := dev.SetupDutyFile(); err != nil {
+		return nil, fmt.Errorf("pwm: Error setting up duty file: %s", err)
+	}
 	return dev, nil
 }
 

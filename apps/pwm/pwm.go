@@ -38,11 +38,11 @@ func cycle(program *cli.Program, command *cli.Command, unknownArgs []string) {
 		return
 	}
 
-	if err = mraa.PwmPeriod(pwm, period); err != nil {
+	if err = pwm.Period(period); err != nil {
 		fmt.Printf("Error setting pwm period to 200 for pin %d: %s\n", pin, err)
 	}
 
-	if err = mraa.PwmEnable(pwm, 1); err != nil {
+	if err = pwm.Enable(1); err != nil {
 		fmt.Printf("Error enabling pin %d: %s\n", pin, err)
 	}
 
@@ -50,12 +50,12 @@ func cycle(program *cli.Program, command *cli.Command, unknownArgs []string) {
 
 	for {
 		value += 0.01
-		mraa.PwmWrite(pwm, value)
+		pwm.Write(value)
 		time.Sleep(50000 * time.Microsecond)
 		if value > 1.0 {
 			value = 0
 		}
-		duty, err := mraa.PwmRead(pwm)
+		duty, err := pwm.Read()
 		if err != nil {
 			fmt.Printf("Error from PwmRead: %s\n", err)
 		} else {
