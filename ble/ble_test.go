@@ -1,7 +1,7 @@
 package ble_test
 
 import (
-	. "../ble"
+	. "github.com/gopackage/edison/ble"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

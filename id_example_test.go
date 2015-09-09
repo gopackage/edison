@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	. "../edison"
+	. "github.com/gopackage/edison"
 )
 
 func ExampleAddrToID() {

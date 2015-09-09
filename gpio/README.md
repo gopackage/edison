@@ -8,6 +8,8 @@ board, your Edison will probably behave as a mini-breakout and this library
 should work and auto-detect your board. If you do encounter problems on a custom
 board, please try to force the board type when creating your GPIO pins.
 
+This library attempts to follow the mraa [pins](http://iotdk.intel.com/docs/master/mraa/edison.html) - use their pin numbers as a guide.
+
 # Installation
 
 We strongly recommend using [gpm][] to develop with this library. If you use

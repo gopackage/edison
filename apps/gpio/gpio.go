@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gopackage/cli"
+	"github.com/gopackage/edison/gpio"
+	"github.com/gopackage/sysfs"
 )
 
 func enable(program *cli.Program, command *cli.Command, unknownArgs []string) {
@@ -31,6 +33,15 @@ func set(program *cli.Program, command *cli.Command, unknownArgs []string) {
 func main() {
 	program := cli.New()
 	program.SetVersion("0.1")
+
+	fmt.Printf("Running gpio init\n")
+	pins := gpio.NewPins(&sysfs.HardwareFile{})
+	err := pins.Init()
+	if err != nil {
+		fmt.Printf("Init failed: %s\n", err)
+	} else {
+		fmt.Printf("Init success\n")
+	}
 
 	program.Command("enable <pin> <mode>", "enable pwm control on <pin>").SetAction(enable)
 	program.Command("disable <pin>", "disable pwm control on <pin>").SetAction(disable)
