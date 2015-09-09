@@ -1,23 +1,11 @@
 // Package gpio provides simplified Go development for Intel Edison.
 package gpio
 
-import (
-	"fmt"
-)
-
-func Init() error {
-	tristate, err := GpioInitRaw(214)
-	if err != nil {
-		return fmt.Errorf("Error opening tristate 214")
-		miniboard = true
-	}
-
-	return nil
-}
+import ()
 
 // Init initializes the Edison gpio pins. This global initialization will
 // be removed and individual pins will initialize as they are created.
-func Init2() error {
+func Init() error {
 	var err error
 	tristate := newDigitalPin(214)
 	if err = tristate.Export(); err != nil {
