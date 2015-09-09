@@ -9,7 +9,7 @@ import (
 
 func enable(program *cli.Program, command *cli.Command, unknownArgs []string) {
 	pin := command.Args[0].IntValue(0)
-	mode := command.Args[0].Value
+	mode := command.Args[1].Value
 	fmt.Printf("enable pin[%d] to mode %s\n", pin, mode)
 }
 

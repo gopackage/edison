@@ -1,8 +1,13 @@
-package gpio
+package mraa
 
 import (
 	"fmt"
 	"os"
+)
+
+var (
+	outputen   = [...]int{248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 232, 233, 234, 235, 236, 237}
+	pullup_map = [...]int{216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 208, 209, 210, 211, 212, 213}
 )
 
 func intel_edison_pinmode_change(sysfs int, mode int) error {
@@ -10,10 +15,10 @@ func intel_edison_pinmode_change(sysfs int, mode int) error {
 		return nil
 	}
 
-	buffer := fmt.Sprintf(SYSFS_PINMODE_PATH+"%i/current_pinmux", sysfs)
+	buffer := fmt.Sprintf(SYSFS_PINMODE_PATH+"%d/current_pinmux", sysfs)
 	modef, err := os.OpenFile(buffer, os.O_WRONLY, 0664)
 	if err != nil {
-		return fmt.Errorf("edison: Failed to open SoC pinmode for opening")
+		return fmt.Errorf("edison: Failed to open SoC pinmode for opening: %s", err)
 	}
 
 	_, err = modef.Write([]byte(fmt.Sprintf("mode%d", mode)))
@@ -48,7 +53,7 @@ func intel_edison_gpio_init_post(dev *gpio_context) error {
 	return intel_edison_pinmode_change(sysfs, mode)
 }
 
-func intel_edison_gpio_mode_replace(dev *gpio_context, mode int) error {
+func intel_edison_gpio_mode_replace(dev *gpio_context, mode string) error {
 	if dev.value_fp != nil {
 		if err := dev.value_fp.Close(); err != nil {
 			return fmt.Errorf("edison: error closing value_fp for pin: %d", dev.pin)
@@ -68,12 +73,16 @@ func intel_edison_gpio_mode_replace(dev *gpio_context, mode int) error {
 
 	value := -1
 	switch mode {
-	case HIGH:
+	case MODE_GPIO_STRONG:
+		break
+	case MODE_GPIO_PULLUP:
 		value = 1
 		break
-	case LOW:
+	case MODE_GPIO_PULLDOWN:
 		value = 0
 		break
+	case MODE_GPIO_HIZ:
+		return nil
 	default:
 		return fmt.Errorf("edison: invalid mode sent to mode_replace: %d", mode)
 	}
