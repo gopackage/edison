@@ -27,9 +27,7 @@ func pulse(program *cli.Program, command *cli.Command, unknownArgs []string) {
 
 func cycle(program *cli.Program, command *cli.Command, unknownArgs []string) {
 	pin := command.Args[0].IntValue(0)
-	// TODO(stephen) handle duty cycle
-	_ = command.Args[1].IntValue(0)
-	period := command.Args[2].IntValue(0)
+	period := command.Args[1].IntValue(0)
 	fmt.Printf("cycle pin[%d]\n", pin)
 
 	pwm, err := mraa.PwmInit(pin)
@@ -46,13 +44,13 @@ func cycle(program *cli.Program, command *cli.Command, unknownArgs []string) {
 		fmt.Printf("Error enabling pin %d: %s\n", pin, err)
 	}
 
-	var value float32 = 0.0
+	var value int = 0
 
 	for {
-		value += 0.01
-		pwm.Write(value)
+		value += 1
+		pwm.Scale(value)
 		time.Sleep(50000 * time.Microsecond)
-		if value > 1.0 {
+		if value > 255 {
 			value = 0
 		}
 		duty, err := pwm.Read()
@@ -73,7 +71,7 @@ func main() {
 	program.Command("enable <pin>", "enable pwm control on <pin>").SetAction(enable)
 	program.Command("disable <pin>", "disable pwm control on <pin>").SetAction(disable)
 	program.Command("pulse <pin> <dutycycle> <period>", "control pwm pulse on <pin> for <dutycycle> over <period>").SetAction(pulse)
-	program.Command("cycle <pin> <dutycycle> <period>", "cycles a pwm through a range of color values on <pin> for <dutycycle> over <period>").SetAction(cycle)
+	program.Command("cycle <pin> <period>", "cycles a pwm through a range of color values on <pin> over <period>").SetAction(cycle)
 
 	program.Parse()
 }

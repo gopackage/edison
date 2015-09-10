@@ -16,9 +16,24 @@ type pwm_context struct {
 	duty_fp *os.File // file pointer to the duty file
 	period  int      // cache the period to speed up setting duty
 	owner   bool     // Owner of the pwm context
+
+	// Automatic scaling of the duty cycle
+	limits Limits  // The limits of scaled values
+	span   float64 // The distance between the scale limits
+	min    float64 // The minimum value of the limits as a float
 }
 
 type PwmContext *pwm_context
+
+// SetLimits sets the limits that scaled PWM outputs are based on.
+// By default, the scale is 0 - 255 to support unsigned byte values
+// common for PWM (e.g. for scaling 24-bit RGB colors).
+func (dev *pwm_context) SetLimits(l Limits) {
+	l.Validate()
+	dev.limits = l
+	dev.min = float64(l.Min)
+	dev.span = float64(l.Max) - dev.min
+}
 
 func (dev *pwm_context) SetupDutyFile() error {
 	buf := fmt.Sprintf("/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev.chipid, dev.pin)
@@ -48,7 +63,7 @@ func (dev *pwm_context) WritePeriod(period int) error {
 
 	out := fmt.Sprintf("%d", period)
 	if _, err := period_f.Write([]byte(out)); err != nil {
-		return fmt.Errorf("pwm: Failed to write period to file: %s", out)
+		return fmt.Errorf("pwm: Failed to write period to file: %s, %s", out, err)
 	}
 	fmt.Printf("pwm: Wrote period[%d] to pin[%d]\n", period, dev.pin)
 
@@ -162,7 +177,7 @@ func (dev *pwm_context) WriteDuty(duty int) error {
 	return nil
 }
 
-func (dev *pwm_context) Write(percentage float32) error {
+func (dev *pwm_context) WritePerc(percentage float32) error {
 	if dev.period == -1 {
 		if err := dev.ReadPeriod(); err != nil {
 			return fmt.Errorf("pwm: pwm_write: %s", err)
@@ -183,12 +198,26 @@ func (dev *pwm_context) Write(percentage float32) error {
 	return dev.WriteDuty(duty)
 }
 
+// Scale sets the duty cycle based on the currently set Limits for the PWM.
+func (dev *pwm_context) Scale(value int) error {
+	if dev.period == -1 {
+		if err := dev.ReadPeriod(); err != nil {
+			return fmt.Errorf("pwm: error running Scale: %s", err)
+		}
+	}
+
+	duty := (float64(value) - dev.min) / dev.span
+	fmt.Printf("pwm: Scaling pin[%d] from value: %d to duty: %f\n", dev.pin, value, duty)
+	return dev.WriteDuty(int(float64(dev.period) * duty))
+}
+
 func PwmInitRaw(chipin, pin int) (*pwm_context, error) {
 	dev := &pwm_context{}
 	dev.duty_fp = nil
 	dev.chipid = chipin
 	dev.pin = pin
 	dev.period = -1
+	dev.SetLimits(Limits{0, 255})
 
 	directory := fmt.Sprintf(SYSFS_PWM+"/pwmchip%d/pwm%d", dev.chipid, dev.pin)
 	s, err := os.Stat(directory)
