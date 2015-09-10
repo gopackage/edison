@@ -4,11 +4,12 @@ import (
 	"fmt"
 
 	"github.com/badslug/cli"
+	"github.com/gopackage/edison/gpio"
 )
 
 func enable(program *cli.Program, command *cli.Command, unknownArgs []string) {
 	pin := command.Args[0].IntValue(0)
-	mode := command.Args[0].Value
+	mode := command.Args[1].Value
 	fmt.Printf("enable pin[%d] to mode %s\n", pin, mode)
 }
 
@@ -31,6 +32,14 @@ func set(program *cli.Program, command *cli.Command, unknownArgs []string) {
 func main() {
 	program := cli.New()
 	program.SetVersion("0.1")
+
+	fmt.Printf("Running gpio init\n")
+	err := gpio.Init()
+	if err != nil {
+		fmt.Printf("Init returned: %s\n", err)
+	} else {
+		fmt.Printf("Init success\n")
+	}
 
 	program.Command("enable <pin> <mode>", "enable pwm control on <pin>").SetAction(enable)
 	program.Command("disable <pin>", "disable pwm control on <pin>").SetAction(disable)

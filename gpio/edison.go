@@ -1,6 +1,8 @@
 // Package gpio provides simplified Go development for Intel Edison.
 package gpio
 
+import ()
+
 // Init initializes the Edison gpio pins. This global initialization will
 // be removed and individual pins will initialize as they are created.
 func Init() error {
