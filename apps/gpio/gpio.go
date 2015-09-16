@@ -3,14 +3,19 @@ package main
 import (
 	"fmt"
 
+<<<<<<< HEAD
 	"github.com/gopackage/cli"
 	"github.com/gopackage/edison/gpio"
 	"github.com/gopackage/sysfs"
+=======
+	"github.com/badslug/cli"
+	"github.com/gopackage/edison/gpio"
+>>>>>>> gopackage/master
 )
 
 func enable(program *cli.Program, command *cli.Command, unknownArgs []string) {
 	pin := command.Args[0].IntValue(0)
-	mode := command.Args[0].Value
+	mode := command.Args[1].Value
 	fmt.Printf("enable pin[%d] to mode %s\n", pin, mode)
 }
 
@@ -35,10 +40,16 @@ func main() {
 	program.SetVersion("0.1")
 
 	fmt.Printf("Running gpio init\n")
+<<<<<<< HEAD
 	pins := gpio.NewPins(&sysfs.HardwareFile{})
 	err := pins.Init()
 	if err != nil {
 		fmt.Printf("Init failed: %s\n", err)
+=======
+	err := gpio.Init()
+	if err != nil {
+		fmt.Printf("Init returned: %s\n", err)
+>>>>>>> gopackage/master
 	} else {
 		fmt.Printf("Init success\n")
 	}
