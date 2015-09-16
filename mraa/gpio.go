@@ -125,9 +125,10 @@ type adv_func_t struct {
 	gpio_write_post func(dev *gpio_context, value int) error
 	//type gpio_mmap_setup (mraa_gpio_context dev, mraa_boolean_t en) (error)
 
-	//type i2c_init_pre (unsigned int bus) (error)
-	//type i2c_init_post (mraa_i2c_context dev) (error)
-	//type i2c_set_frequency_replace (mraa_i2c_context dev, mraa_i2c_mode_t mode) (error)
+	i2c_init_pre              func(bus uint) error
+	i2c_init_bus_replace      func(dev *i2c_context) error
+	i2c_init_post             func(dev *i2c_context) error
+	i2c_set_frequency_replace func(dev *i2c_context, mode string) error
 
 	//type aio_get_valid_fp (mraa_aio_context dev) (error)
 	//type aio_init_pre (unsigned int aio) (error)

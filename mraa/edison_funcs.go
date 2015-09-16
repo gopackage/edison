@@ -100,3 +100,61 @@ func intel_edison_gpio_mode_replace(dev *gpio_context, mode string) error {
 
 	return gpio_close(pullup)
 }
+
+func intel_edison_i2c_init_pre(bus uint) error {
+	if miniboard == false {
+		// TODO(stephen): handle non-miniboard init pre
+	} else {
+		if bus != 6 && bus != 1 {
+			fmt.Printf("edison: You can't use that bus, switching to bus 6\n")
+			bus = 6
+		}
+		scl := plat.pins[plat.i2c_bus[bus].scl].gpio.pinmap
+		sda := plat.pins[plat.i2c_bus[bus].sda].gpio.pinmap
+		intel_edison_pinmode_change(int(sda), 1)
+		intel_edison_pinmode_change(int(scl), 1)
+	}
+
+	return nil
+}
+
+func intel_edison_i2c_freq(dev *i2c_context, mode string) error {
+	var sysnode *os.File = nil
+	var err error
+
+	switch dev.busnum {
+	case 1:
+		sysnode, err = os.OpenFile("/sys/devices/pci0000:00/0000:00:08.0/i2c_dw_sysnode/mode", os.O_RDWR, 0664)
+		break
+	case 6:
+		sysnode, err = os.OpenFile("/sys/devices/pci0000:00/0000:00:09.0/i2c_dw_sysnode/mode", os.O_RDWR, 0664)
+		break
+	default:
+		err = fmt.Errorf("edisoN: i2c bus selected does not support frequency changes")
+	}
+
+	if err != nil {
+		return err
+	}
+	defer sysnode.Close()
+
+	buf := ""
+	switch mode {
+	case I2C_STD:
+		buf = "std"
+		break
+	case I2C_FAST:
+		buf = "fast"
+		break
+	case I2C_HIGH:
+		buf = "high"
+		break
+	default:
+		return fmt.Errorf("edison: Invalid i2c mode selected")
+	}
+
+	if _, err = sysnode.Write([]byte(buf)); err != nil {
+		return fmt.Errorf("edison: Error writing to sysnode %s: %s", sysnode, err)
+	}
+	return nil
+}
