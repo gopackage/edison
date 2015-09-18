@@ -363,7 +363,7 @@ func InitMiniboard(b *board_t) {
 
 func InitEdison() error {
 	board := board_t{}
-	tristate, err := GpioInitRaw(214)
+	/*tristate*/ _, err := GpioInitRaw(214)
 	if err == nil {
 		InitMiniboard(&board)
 	} else {

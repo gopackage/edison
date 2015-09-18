@@ -177,7 +177,7 @@ type board_t struct {
 
 func gpio_get_value_file_handle(dev *gpio_context) error {
 	du := fmt.Sprintf(SYSFS_CLASS_GPIO+"/gpio%d/value", dev.pin)
-	file, err := OpenFile(du, os.O_RDWR, 0664)
+	file, err := os.OpenFile(du, os.O_RDWR, 0664)
 	if err != nil {
 		return fmt.Errorf("Error opening value file %s for pin: %d", du, dev.pin)
 	}
@@ -406,6 +406,17 @@ func GpioInitRaw(pin int) (*gpio_context, error) {
 	return dev, nil
 }
 
+func writeFile(path string, data []byte) (i int, err error) {
+	fmt.Println(">>", path, string(data))
+	file, err := os.OpenFile(path, os.O_WRONLY, 0644)
+	defer file.Close()
+	if err != nil {
+		return
+	}
+
+	return file.Write(data)
+}
+
 func pwm_setup_duty_fp(dev *pwm_context) error {
 	buf := fmt.Sprintf("/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev.chipid, dev.pin)
 	file, err := os.OpenFile(buf, os.O_RDWR, 0664)
@@ -463,6 +474,9 @@ func PwmInitRaw(chipin, pin int) (*pwm_context, error) {
 	} else {
 		buffer := fmt.Sprintf("/sys/class/pwm/pwmchip%d/export", dev.chipid)
 		export_f, err := os.OpenFile(buffer, os.O_WRONLY, 0664)
+		if err != nil {
+			return nil, err
+		}
 		if export_f == nil {
 			return nil, fmt.Errorf("pwm: failed to open export for writing")
 		}

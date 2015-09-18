@@ -4,12 +4,8 @@ import (
 	"fmt"
 	"time"
 
-<<<<<<< HEAD
 	"github.com/gopackage/cli"
-=======
-	"github.com/badslug/cli"
 	"github.com/gopackage/edison/mraa"
->>>>>>> gopackage/master
 )
 
 func enable(program *cli.Program, command *cli.Command, unknownArgs []string) {
@@ -48,10 +44,10 @@ func cycle(program *cli.Program, command *cli.Command, unknownArgs []string) {
 		fmt.Printf("Error enabling pin %d: %s\n", pin, err)
 	}
 
-	var value int = 0
+	var value int
 
 	for {
-		value += 1
+		value++
 		pwm.Scale(value)
 		time.Sleep(50000 * time.Microsecond)
 		if value > 255 {
