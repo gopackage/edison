@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/badslug/cli"
+	"github.com/gopackage/cli"
 )
 
 func scan(program *cli.Program, command *cli.Command, unknownArgs []string) {

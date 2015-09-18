@@ -3,7 +3,7 @@ package edison_test
 import (
 	"net"
 
-	. "../edison"
+	. "github.com/gopackage/edison"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

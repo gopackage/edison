@@ -1,2 +1,5 @@
 github.com/onsi/ginkgo          v1.2.0          # Unit tests
 github.com/onsi/gomega          d6c945f9fdbf    # Assertions for unit tests
+
+github.com/gopackage/cli        f961d9ad59      # Command line lib for apps (not required for library itself)
+github.com/twinj/uuid           70cac2bcd2      # UUID generator for unit tests (not required for library itself)

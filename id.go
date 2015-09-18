@@ -6,9 +6,9 @@ import (
 	"net"
 )
 
-// DeviceID returns the current device ID. Currently this is the MAC address
+// DeviceIntID returns the current device ID. Currently this is the MAC address
 // of the wifi interface on the device.
-func DeviceID() (uint64, error) {
+func DeviceIntID() (uint64, error) {
 	// Grab hardware ID for the WiFi interface
 	// we assume it is `wlan0`
 	interfaces, err := net.Interfaces()
@@ -24,10 +24,9 @@ func DeviceID() (uint64, error) {
 	return 0, errors.New("Missing WiFi interface wlan0")
 }
 
-// DeviceIDx returns the current device ID as a hex encoded string. Most
-// APIs will expect the hex encoded stringversion of the device ID so this
-// is a convenience method to give you that directly.
-func DeviceIDx() (string, error) {
+// DeviceID returns the current device ID as a hex encoded string. Most
+// APIs will expect the hex encoded string version of the device ID.
+func DeviceID() (string, error) {
 	id, err := DeviceID()
 	if err != nil {
 		return "", err
