@@ -7,7 +7,7 @@ import (
 
 func main() {
 	_ = mraa.Init()
-	var bus uint = 6
+	var bus uint = 0
 
 	_, err := mraa.I2cInit(bus)
 	if err != nil {
